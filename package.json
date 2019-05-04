@@ -1,0 +1,41 @@
+{
+  "name": "missive-gcal-export-integration",
+  "version": "1.0.0",
+  "description": "Adds an integration to the Missive mail app that parses emails for dates and displays them to be exported to Google Calendar if desired.",
+  "keywords": [
+    "missive",
+    "google calendar",
+    "integration",
+    "mail"
+  ],
+  "homepage": "https://zachhardesty.com/missive",
+  "bugs": "https://github.com/zachhardesty7/missive-gcal-export-integration/issues",
+  "main": "dist",
+  "license": "MIT",
+  "author": "Zach Hardesty <hello@zachhardesty.com> (https://zachhardesty.com)",
+  "repository": "github:zachhardesty7/missive-gcal-export-integration",
+  "private": true,
+  "scripts": {
+    "deploy": "node deploy",
+    "server": "live-server --no-browser",
+    "tunnel": "lt --subdomain missive-gcal --port 8080",
+    "dev": "run-p server tunnel"
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.0.1",
+    "eslint": "5.16.0",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-plugin-import": "^2.16.0",
+    "eslint-plugin-jsx-a11y": "^6.2.1",
+    "eslint-plugin-node": "^8.0.1",
+    "eslint-plugin-promise": "^4.1.1",
+    "eslint-plugin-react": "^7.12.4",
+    "eslint-plugin-react-hooks": "1.6.0",
+    "eslint-plugin-standard": "^4.0.0",
+    "ftp-deploy": "^2.3.3",
+    "live-server": "^1.2.1",
+    "localtunnel": "^1.9.1",
+    "npm-run-all": "^4.1.5"
+  }
+}

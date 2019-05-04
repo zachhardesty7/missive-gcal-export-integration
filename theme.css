@@ -1,0 +1,67 @@
+:root {
+  --animation-duration: 225ms;
+  --animation-easing: cubic-bezier(0.4,0,0.2,1);
+  --checkmark-color: #00b351;
+  --accent-color: #2266ed;
+  
+  --missive-font-size: 14px;
+  
+  --missive-text-color-a: #34363a;
+  --missive-text-color-b: #525457;
+  --missive-text-color-c: #7b7c7f;
+  --missive-text-color-d: #999a9c;
+  --missive-text-color-e: #cccdce;
+  
+  --missive-blue-color: #2266ed;
+  --missive-orange-color: #ff8400;
+  --missive-green-color: #00b351;
+  --missive-red-color: #f23131;
+  --missive-yellow-color: #fdd157;
+  --missive-light-blue-color: #e3f0fe;
+  --missive-light-orange-color: #fdf2e7;
+  
+  --missive-border-color: #dcdcdc;
+  --missive-light-border-color: #e5e6e7;
+  
+  --missive-conversation-list-border-color: #dcdcdc;
+  --missive-conversation-list-background-color: #fff;
+  --missive-conversations-separator-opacity: 0.08;
+  
+  --missive-background-color: #f5f6f7;
+  --missive-light-active-color: #fafafa;
+  --missive-token-background-color: #e6e7e8;
+}
+
+[data-theme=dark] {
+  --animation-duration: 225ms;
+  --animation-easing: cubic-bezier(0.4,0,0.2,1);
+  --checkmark-color: #00b351;
+  --accent-color: #3a82f7;
+
+  --missive-font-size: 14px;
+
+  --missive-text-color-a: #dededd;
+  --missive-text-color-b: #c4c4c3;
+  --missive-text-color-c: #a0a1a0;
+  --missive-text-color-d: #868685;
+  --missive-text-color-e: #595a59;
+
+  --missive-blue-color: #3a82f7;
+  --missive-orange-color: #ff8400;
+  --missive-green-color: #00b351;
+  --missive-red-color: #f23131;
+  --missive-yellow-color: #fdd157;
+  --missive-light-blue-color: #3c444c;
+  --missive-light-orange-color: #443424;
+
+  --missive-border-color: #555453;
+  --missive-light-border-color: #454443;
+
+  --missive-conversation-list-border-color: #000;
+  --missive-conversation-list-background-color: #232221;
+  --missive-conversations-separator-opacity: 0.2;
+
+  --missive-background-color: #2d2e2d;
+  --missive-light-active-color: #333332;
+  --missive-token-background-color: #232221;
+}
