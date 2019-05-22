@@ -19,6 +19,7 @@
     "deploy": "node deploy",
     "server": "live-server --no-browser",
     "tunnel": "lt --subdomain missive-gcal --port 8080",
+    "start": "run-p server tunnel",
     "dev": "run-p server tunnel"
   },
   "devDependencies": {
