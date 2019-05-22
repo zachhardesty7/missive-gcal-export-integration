@@ -20,4 +20,15 @@ missive-gcal` to `--subdomain [YOUR TEXT]`.
     your server that's hosting the previously mentioned 3 files
 - Close modal
 
+## Acknowledgements
+
+[chrono](https://github.com/wanasit/chrono) - natural language processing with a focus on dates and
+times
+[ESLint](https://github.com/eslint/eslint) - enforce my favorite styles
+[ftp-deploy](https://github.com/simonh1000/ftp-deploy) - helpful for deploying integration to your
+server and simpler than other tools
+[live-server](https://github.com/tapio/live-server) - ultra simple quick local server with hot-reloading for testing
+[localtunnel](https://github.com/localtunnel/localtunnel) - allow Missive to access your local server
+[npm-run-all](https://github.com/mysticatea/npm-run-all) - run the server and the tunnel in parallel in 1 terminal
+
 *Copyright (c) 2019 || Zach Hardesty || [zachhardesty.com](https://zachhardesty.com)*
