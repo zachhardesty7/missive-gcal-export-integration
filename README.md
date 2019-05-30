@@ -1,7 +1,8 @@
 # Missive GCal Export Integration
 
 Adds an integration to the [Missive mail app](https://missiveapp.com/) that parses emails for dates/times
-and displays them for exporting to Google Calendar if desired. Three files (`index.html`, `main.js`,
+and displays them for exporting to Google Calendar if desired. Clicking the export button will
+automatically open the "New Event" page and allow the user to customize any fields' content. Three files (`index.html`, `main.js`,
 `theme.css`) need to be deployed to a server that the Missive app can reach. A sample is deployed
 on [my website](https://zachhardesty.com/missive) or you can deploy the app from source on a local server by executing `yarn
 dev` after probably needing to change the `yarn deploy` command from where it says `--subdomain
@@ -19,6 +20,16 @@ missive-gcal` to `--subdomain [YOUR TEXT]`.
   - iFrame URL: `https://[YOUR TEXT].localtunnel.me` or `https://zachhardesty.com/missive` or url of
     your server that's hosting the previously mentioned 3 files
 - Close modal
+
+## Preview
+
+light
+
+![sidebar-light](https://i.imgur.com/KTrw9or.png)
+
+dark
+
+![sidebar-dark](https://i.imgur.com/aETnd8F.png)
 
 ## Acknowledgements
 
