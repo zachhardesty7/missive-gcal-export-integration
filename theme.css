@@ -1,4 +1,14 @@
-#github-icon {
+.support-icon {
+  position: absolute;
+  right: 1em;
+}
+
+.support-icon svg {
+  width:26px;
+  height:26px;
+}
+
+.support-icon svg path {
   fill: var(--missive-text-color-a);
 }
 
