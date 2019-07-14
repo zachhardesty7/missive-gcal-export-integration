@@ -7,11 +7,22 @@ const HIDE_PAST_EVENTS = true
 
 /**
  * strings to ignore when unintentionally picked up by chrono
+ *
+ * **NOTE:** case sensitive
  */
-const blacklist = [
+const blacklistCaseSensitive = [
+	'sun',
+]
+
+/**
+ * strings to ignore when unintentionally picked up by chrono
+ *
+ * **NOTE:** case insensitive
+ */
+const blacklistCaseInsensitive = [
 	'now',
 	// individual month's would nearly never be used as a Google Calendar event
-	'jan', 'feb', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december',
+	'january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december',
 	// weird ones I stumbled on
 	'1-800',
 	'a 12',
@@ -129,7 +140,8 @@ Missive.on('change:conversations', (ids) => {
 
 					// find dates / times and filter blacklisted matches
 					const matches = chrono.parse(body)
-						.filter(match => !blacklist.includes(match.text.trim().toLowerCase()))
+						.filter(match => !blacklistCaseSensitive.includes(match.text.trim()))
+						.filter(match => !blacklistCaseInsensitive.includes(match.text.trim().toLowerCase()))
 
 					// render if matches exist
 					const results = document.querySelector('#results')
