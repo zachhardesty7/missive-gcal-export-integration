@@ -96,7 +96,7 @@ const card = (orig, start = '', end = '', link) => html`
       <p class="text">${start}</p>
       ${end && html`<p class="text">${end}</p>`}
     </div>
-    <a target="_blank" href=${link} class="button">Export</a>
+    <a target="_blank" @click=${() => Missive.openURL(link)} href=${link} class="button">Export</a>
   </div>
 `
 
