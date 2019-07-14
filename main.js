@@ -27,7 +27,7 @@ const blacklistCaseSensitive = [
  * **NOTE:** case insensitive
  */
 const blacklistCaseInsensitive = [
-	'now',
+	'now', 'today',
 	// individual month's would nearly never be used as a Google Calendar event
 	'january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december',
 	// weird ones I stumbled on
