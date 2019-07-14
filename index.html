@@ -31,7 +31,35 @@
     <div id="results"></div>
   </div>
 
-  <script type="module" src="main.js"></script>
+  <script>
+    async function sha256(message) {
+
+      // encode as UTF-8
+      const msgBuffer = new TextEncoder('utf-8').encode(message);
+
+      // hash the message
+      const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+
+      // convert ArrayBuffer to Array
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+
+      // convert bytes to hex string
+      const hashHex = hashArray.map(b => ('00' + b.toString(16)).slice(-2)).join('');
+      return hashHex;
+    }
+
+    (async function () {
+      const file = await fetch('main.js')
+      const text = await file.text()
+      const hash = await sha256(text);
+
+      const script = document.createElement('script')
+      script.src = `main.js?${hash}`
+      script.type = 'module'
+
+      document.body.append(script)
+    }());
+  </script>
 </body>
 
 </html>
