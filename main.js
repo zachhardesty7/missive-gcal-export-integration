@@ -2,6 +2,13 @@
 // eslint-disable-next-line import/no-unresolved
 import { html, render } from 'https://unpkg.com/lit-html?module'
 
+/* eslint-disable max-len */
+/**
+ * @typedef {import('lit-html').TemplateResult} TemplateResult
+ * @typedef {{ index: number, text: string, tags: object, start: { knownValues: [object],impliedValues: [object] }, end: { knownValues: [object], impliedValues: [object] } }[]} ChronoDates
+ */
+/* eslint-enable max-len */
+
 // doesn't make much sense to create a calendar event in the past
 const HIDE_PAST_EVENTS = true
 
@@ -80,9 +87,9 @@ const buildLink = (title = '', start = '', end = '', details = '', location = ''
  * @param {string} start - completely parsed date-like event start
  * @param {string} end - completely parsed date-like event end
  * @param {string} link - Google Calendar auto-create event link for button
- * @returns {TemplateStringsArray} template to be rendered into html of detected info
+ * @returns {TemplateResult} template to be rendered into html of detected info
  */
-const item = (orig, start = '', end = '', link) => html`
+const card = (orig, start = '', end = '', link) => html`
   <div class="card shadow padding-xlarge">
     <h3 class="title">${orig}</h3>
     <div class="margin-top-xlarge margin-bottom-xlarge">
@@ -97,27 +104,40 @@ const item = (orig, start = '', end = '', link) => html`
  * template for container of cards with info from parsed date/time
  * from email body using `lit-html`
  *
- * @param {Array} matches - result array of calling chrono.parse
+ * @param {ChronoDates} matches - result array of calling chrono.parse
  * @param {string} title - as shown on GCal event
  * @param {string} details - arbitrary info to include in event body
  * @param {string} location - physical location of event
- * @returns {TemplateStringsArray} rendered side-bar
+ * @returns {TemplateResult[]} built cards from input matches data
  */
-const sidebar = (matches, title, details, location) => html`
-  <h2 class="text-xlarge align-center padding-top-medium">detected events</h2>
-  ${matches.map((match) => {
+const cards = (matches, title, details, location) => (
+	matches.map((match) => {
 		const start = match.start.date()
 		const end = match.end ? match.end.date() : ''
 
 		// filter dates from the past
-		if (HIDE_PAST_EVENTS && Missive.isPast(start)) return null
 		if (start.toString() === 'Invalid Date' || end.toString() === 'Invalid Date') return null
+		if (HIDE_PAST_EVENTS && Missive.isPast(start)) return null
 
 		const link = buildLink(title, start, end, details, location)
-		return item(match.text, start, end, link)
-	})}
-`
+		return card(match.text, start, end, link)
+	}).filter(Boolean)
+)
 
+/**
+ * @param {TemplateResult[]} items - cards to be rendered, any node
+ * @returns {TemplateResult} sidebar with appropriate header and cards
+ */
+const sidebar = items => (
+	items.length !== 0
+		? html`
+			<h2 class="text-xlarge align-center padding-top-medium">detected events</h2>
+			${items}
+		`
+		: html`<p class="text-large align-center padding-top-large">no matches</p>`
+)
+
+// activate reload button
 document.querySelector('#reload')
 	.addEventListener('click', () => Missive.reload())
 
@@ -143,11 +163,11 @@ Missive.on('change:conversations', (ids) => {
 						.filter(match => !blacklistCaseSensitive.includes(match.text.trim()))
 						.filter(match => !blacklistCaseInsensitive.includes(match.text.trim().toLowerCase()))
 
-					// render if matches exist
+					const cardItems = cards(matches, message.subject, `${reference}\n${body}`)
+
+					// render widget
 					const results = document.querySelector('#results')
-					matches.length !== 0
-						? render(sidebar(matches, message.subject, `${reference}\n${body}`), results)
-						: render(html`<p class="text-large align-center padding-top-large">no matches</p>`, results)
+					render(sidebar(cardItems), results)
 				}
 			}
 			return null // ESLint error if not included

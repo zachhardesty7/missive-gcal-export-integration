@@ -1,6 +1,6 @@
 {
   "name": "missive-gcal-export-integration",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "description": "Adds an integration to the Missive mail app that parses emails for dates and displays them to be exported to Google Calendar if desired.",
   "keywords": [
     "missive",
@@ -17,7 +17,7 @@
   "private": true,
   "scripts": {
     "deploy": "node deploy",
-    "server": "live-server --no-browser",
+    "server": "live-server --no-browser --watch=main.js,index.html,theme.css",
     "tunnel": "lt --subdomain missive-gcal --port 8080",
     "start": "run-p server tunnel",
     "dev": "run-p server tunnel"
@@ -27,6 +27,7 @@
     "eslint": "5.16.0",
     "eslint-config-hardesty": "^1.0.3",
     "ftp-deploy": "^2.3.3",
+    "lit-html": "^1.1.1",
     "live-server": "^1.2.1",
     "localtunnel": "^1.9.1",
     "npm-run-all": "^4.1.5"
