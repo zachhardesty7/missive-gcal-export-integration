@@ -2,11 +2,19 @@
 // eslint-disable-next-line import/no-unresolved
 import { html, render } from 'https://unpkg.com/lit-html?module'
 
+// doesn't make much sense to create a calendar event in the past
+const HIDE_PAST_EVENTS = true
+
 /**
  * strings to ignore when unintentionally picked up by chrono
  */
 const blacklist = [
+	'now',
+	// individual month's would nearly never be used as a Google Calendar event
+	'jan', 'feb', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december',
+	// weird ones I stumbled on
 	'1-800',
+	'a 12',
 ]
 
 /**
@@ -16,7 +24,7 @@ const blacklist = [
  * @param {string} str - date-like arbitrary string
  * @returns {string} GCal supported date string or empty string
  */
-const formatAsGCalDate = (str = '') => console.log(str) || (
+const formatAsGCalDate = (str = '') => (
 	(
 		str &&
     (new Date(str)) &&
@@ -87,16 +95,14 @@ const item = (orig, start = '', end = '', link) => html`
 const sidebar = (matches, title, details, location) => html`
   <h2 class="text-xlarge align-center padding-top-medium">detected events</h2>
   ${matches.map((match) => {
-		console.log(match.start)
-
 		const start = match.start.date()
 		const end = match.end ? match.end.date() : ''
-		// console.log(`start: ${match.start} | end: ${match.end}`)
-		// start === 'Invalid Date'
 
-		// start !== 'Invalid Date' || end === 'Invalid Date'
+		// filter dates from the past
+		if (HIDE_PAST_EVENTS && Missive.isPast(start)) return null
+		if (start.toString() === 'Invalid Date' || end.toString() === 'Invalid Date') return null
+
 		const link = buildLink(title, start, end, details, location)
-
 		return item(match.text, start, end, link)
 	})}
 `
@@ -122,7 +128,8 @@ Missive.on('change:conversations', (ids) => {
 					const body = nodes.innerText.replace(/\s+/gm, ' ').trim()
 
 					// find dates / times and filter blacklisted matches
-					const matches = chrono.parse(body).filter(match => !blacklist.includes(match.text))
+					const matches = chrono.parse(body)
+						.filter(match => !blacklist.includes(match.text.trim().toLowerCase()))
 
 					// render if matches exist
 					const results = document.querySelector('#results')
