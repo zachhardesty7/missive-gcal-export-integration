@@ -91,7 +91,7 @@ const buildLink = (title = '', start = '', end = '', details = '', location = ''
  */
 const card = (orig, start = '', end = '', link) => html`
   <div class="card shadow padding-xlarge">
-    <h3 class="title">${orig}</h3>
+    <h3 class="title text-600">${orig}</h3>
     <div class="margin-top-xlarge margin-bottom-xlarge">
 			<p>
 				<span class="text-c label-date">
@@ -144,7 +144,7 @@ const cards = (matches, title, details, location) => (
 const sidebar = items => (
 	items.length !== 0
 		? html`
-			<h2 class="text-xlarge align-center padding-top-medium">detected events</h2>
+			<h2 class="text-xlarge align-center padding-top-medium text-600">detected events</h2>
 			${items}
 		`
 		: html`<p class="text-large align-center padding-top-large">no matches</p>`
