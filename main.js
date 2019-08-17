@@ -93,8 +93,21 @@ const card = (orig, start = '', end = '', link) => html`
   <div class="card shadow padding-xlarge">
     <h3 class="title">${orig}</h3>
     <div class="margin-top-xlarge margin-bottom-xlarge">
-      <p class="text">${start}</p>
-      ${end && html`<p class="text">${end}</p>`}
+			<p>
+				<span class="text-c label-date">
+					<!-- REVIEW: keep 'At' label? -->
+					${!end ? 'At: ' : 'Start: '}
+				</span>
+				${start}
+			</p>
+			${end && html`
+				<p>
+					<span class="text-c label-date">
+						End: 
+					</span>
+					${end}
+				</p>
+			`}
     </div>
     <a target="_blank" @click=${() => Missive.openURL(link)} href=${link} class="button">Export</a>
   </div>
@@ -155,8 +168,7 @@ Missive.on('change:conversations', (ids) => {
 					// extract raw text from stringified html provided
 					const template = document.createElement('template')
 					template.innerHTML = message.body
-					const nodes = template.content.firstChild
-					const body = nodes.innerText.replace(/\s+/gm, ' ').trim()
+					const body = template.content.textContent.replace(/\s+/gm, ' ').trim()
 
 					// find dates / times and filter blacklisted matches
 					const matches = chrono.parse(body)

@@ -39,6 +39,10 @@
   margin: 0;
 }
 
+.label-date {
+  font-size: 14px;
+}
+
 #component::-webkit-scrollbar {
 	width: 8px;
 }
