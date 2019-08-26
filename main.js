@@ -2,13 +2,6 @@
 // eslint-disable-next-line import/no-unresolved
 import { html, render } from 'https://unpkg.com/lit-html?module'
 
-/* eslint-disable max-len */
-/**
- * @typedef {import('lit-html').TemplateResult} TemplateResult
- * @typedef {{ index: number, text: string, tags: object, start: { knownValues: [object],impliedValues: [object] }, end: { knownValues: [object], impliedValues: [object] } }[]} ChronoDates
- */
-/* eslint-enable max-len */
-
 // doesn't make much sense to create a calendar event in the past
 const HIDE_PAST_EVENTS = true
 // also match duplicates via start and end datetime
@@ -39,6 +32,14 @@ const blacklistCaseInsensitive = [
 	'a 12',
 ]
 
+/**
+ * filters out certain text matches if any of the (enabled) following are true:
+ * case sensitive or insensitive blacklisted, start is 'Invalid Date' when parsing,
+ * event starts in the past, duplicate text, duplicate start and end time
+ *
+ * @param {ChronoDates} matches - list of matches returned by Chrono
+ * @returns {ChronoDates} shorter array than input (w/o meta info for start/end)
+ */
 const filterMatches = (matches) => {
 	const cleanMatches = matches.map((match) => {
 		const clone = { ...match }
@@ -71,7 +72,7 @@ const filterMatches = (matches) => {
 	})
 	let output = Object.values(matchTable)
 
-	// reuse and filter for duplicate start/end datetimes
+	// reuse and filter duplicate start/end datetimes
 	if (AGGRESSIVELY_FILTER_DUPLICATES) {
 		matchTable = {}
 		output.forEach((match) => {
@@ -205,8 +206,7 @@ document.querySelector('#reload')
 	.addEventListener('click', () => Missive.reload())
 
 /**
- * triggers on every time email is loaded and renders matches
- * if any are found
+ * triggers each time email is loaded and renders found matches
  */
 Missive.on('change:conversations', (ids) => {
 	Missive.fetchConversations(ids, ['latest_message', 'link'])
@@ -224,14 +224,19 @@ Missive.on('change:conversations', (ids) => {
 					const details = `<strong>LINK:</strong>\n${reference}${INCLUDE_BODY ? `\n\n<strong>EMAIL:</strong>\n${body}` : ''}`
 					const cardItems = cards(matches, message.subject, details)
 
-					// render widget
 					const results = document.querySelector('#results')
 					render(sidebar(cardItems), results)
 				}
 			}
-			return null // ESLint error if not included
+			return null // required by linter
 		}).catch((e) => {
 			console.error(`GCalError\n${e.stack}`)
 			Missive.alert({ title: 'error in GCal script', message: e.toString() })
 		})
 })
+
+/* eslint-disable max-len */
+/**
+ * @typedef {import('lit-html').TemplateResult} TemplateResult
+ * @typedef {{ index: number, text: string, tags: object, start: { knownValues: [object],impliedValues: [object] }, end: { knownValues: [object], impliedValues: [object] } }[]} ChronoDates
+ */
