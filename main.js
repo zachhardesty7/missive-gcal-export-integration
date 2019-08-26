@@ -15,7 +15,7 @@ const HIDE_PAST_EVENTS = true
 /**
  * strings to ignore when unintentionally picked up by chrono
  *
- * **NOTE:** case sensitive
+ * **NOTE** - case sensitive
  */
 const blacklistCaseSensitive = [
 	'sun',
@@ -24,7 +24,7 @@ const blacklistCaseSensitive = [
 /**
  * strings to ignore when unintentionally picked up by chrono
  *
- * **NOTE:** case insensitive
+ * **NOTE** - case insensitive
  */
 const blacklistCaseInsensitive = [
 	'now', 'today',

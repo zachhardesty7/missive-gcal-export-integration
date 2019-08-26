@@ -32,8 +32,8 @@
   </div>
 
   <script>
+    /** load main script and append a hash of file to the filename */
     async function sha256(message) {
-
       // encode as UTF-8
       const msgBuffer = new TextEncoder('utf-8').encode(message);
 
