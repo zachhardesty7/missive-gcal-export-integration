@@ -13,6 +13,8 @@ import { html, render } from 'https://unpkg.com/lit-html?module'
 const HIDE_PAST_EVENTS = true
 // also match duplicates via start and end datetime
 const AGGRESSIVELY_FILTER_DUPLICATES = true
+// copy email body into Google Calendar event
+const INCLUDE_BODY = false
 
 /**
  * strings to ignore when unintentionally picked up by chrono
@@ -219,7 +221,8 @@ Missive.on('change:conversations', (ids) => {
 					const body = template.content.textContent.replace(/\s+/gm, ' ').trim()
 
 					const matches = filterMatches(chrono.parse(body))
-					const cardItems = cards(matches, message.subject, `${reference}\n${body}`)
+					const details = `<strong>LINK:</strong>\n${reference}${INCLUDE_BODY ? `\n\n<strong>EMAIL:</strong>\n${body}` : ''}`
+					const cardItems = cards(matches, message.subject, details)
 
 					// render widget
 					const results = document.querySelector('#results')
