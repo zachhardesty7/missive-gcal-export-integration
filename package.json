@@ -1,6 +1,6 @@
 {
   "name": "missive-gcal-export-integration",
-  "version": "1.8.0",
+  "version": "1.8.1",
   "description": "Adds an integration to the Missive mail app that parses emails for dates and displays them to be exported to Google Calendar if desired.",
   "keywords": [
     "missive",

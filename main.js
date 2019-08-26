@@ -112,7 +112,15 @@ const formatAsGCalDate = (str = '') => (
 const buildLink = (title = '', start = '', end = '', details = '', location = '') => {
 	const link = new URLSearchParams()
 	const startFormatted = formatAsGCalDate(start)
-	const endFormatted = formatAsGCalDate(end)
+	let endFormatted = formatAsGCalDate(end)
+
+	// fill in empty end datetime as 1 hour after start datetime
+	if (!endFormatted) {
+		const datetime = new Date(start)
+		datetime.setHours(datetime.getHours() + 1)
+
+		endFormatted = formatAsGCalDate(datetime)
+	}
 
 	link.append('action', 'TEMPLATE')
 	link.append('text', title)
