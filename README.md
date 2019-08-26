@@ -1,12 +1,13 @@
 # Missive GCal Export Integration
 
 Adds an integration to the [Missive mail app](https://missiveapp.com/) that parses emails for dates/times
-and displays them for exporting to Google Calendar if desired. Clicking the export button will
-automatically open the "New Event" page and allow the user to customize any fields' content. Three files (`index.html`, `main.js`,
+and displays them to export to Google Calendar if desired. Clicking the export button will
+automatically open Google Calendar's "New Event" page and allow you to customize fields' content. Three files (`index.html`, `main.js`,
 `theme.css`) need to be deployed to a server that the Missive app can reach. A sample is deployed
-on [my website](https://zachhardesty.com/missive) or you can deploy the app from source on a local server by executing `yarn
-dev` after probably needing to change the `yarn deploy` command from where it says `--subdomain
-missive-gcal` to `--subdomain [YOUR TEXT]`.
+on [my website](https://zachhardesty.com/missive) or you can run the integration from source on a local server by executing `yarn
+start` after changing the text following the `tunnel` command [on line 21 of `package.json`](package.json#L21) from `--subdomain
+missive-gcal` to `--subdomain [YOUR TEXT]`. The local server sometimes fails to start due to a bug
+with `localtunnel`, just run `yarn start` again.
 
 ## Activating the Integration
 
@@ -15,8 +16,8 @@ missive-gcal` to `--subdomain [YOUR TEXT]`.
 - click `Integrations` in the flyover menu
 - click `Add integration` at the bottom of the modal
 - select the `Custom` option with a gear at the bottom of the list
-- Enter `Name` & `iFrame URL`
-  - Name: `GCal Export`
+- enter `Name` & `iFrame URL` as...
+  - Name: `Google Calendar Export`
   - iFrame URL: `https://[YOUR TEXT].localtunnel.me` or `https://zachhardesty.com/missive` or url of
     your server that's hosting the previously mentioned 3 files
 - Close modal

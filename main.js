@@ -11,6 +11,8 @@ import { html, render } from 'https://unpkg.com/lit-html?module'
 
 // doesn't make much sense to create a calendar event in the past
 const HIDE_PAST_EVENTS = true
+// also match duplicates via start and end datetime
+const AGGRESSIVELY_FILTER_DUPLICATES = true
 
 /**
  * strings to ignore when unintentionally picked up by chrono
@@ -34,6 +36,51 @@ const blacklistCaseInsensitive = [
 	'1-800',
 	'a 12',
 ]
+
+const filterMatches = (matches) => {
+	const cleanMatches = matches.map((match) => {
+		const clone = { ...match }
+
+		// convert match info to datetime string
+		clone.start = clone.start.date()
+		clone.end = clone.end ? clone.end.date() : ''
+
+		// hide invalid end values
+		if (clone.end === 'Invalid Date') clone.end = ''
+
+		return clone
+	})
+
+	const filteredMatches = cleanMatches
+		// remove blacklisted items
+		.filter(({ text }) => !blacklistCaseSensitive.includes(text.trim()))
+		.filter(({ text }) => !blacklistCaseInsensitive.includes(text.trim().toLowerCase()))
+
+		// remove items without valid end datetime
+		.filter(({ start }) => start !== 'Invalid Date')
+
+		// if enabled, hide datetimes that started in the past
+		.filter(({ start }) => !HIDE_PAST_EVENTS || !Missive.isPast(start))
+
+	// convert from arr -> obj -> arr to remove identical text datetimes
+	let matchTable = {}
+	filteredMatches.forEach((match) => {
+		if (!matchTable[match.text]) matchTable[match.text] = match
+	})
+	let output = Object.values(matchTable)
+
+	// reuse and filter for duplicate start/end datetimes
+	if (AGGRESSIVELY_FILTER_DUPLICATES) {
+		matchTable = {}
+		output.forEach((match) => {
+			const key = match.start + match.end
+			if (!matchTable[key]) matchTable[key] = match
+		})
+		output = Object.values(matchTable)
+	}
+
+	return output
+}
 
 /**
  * simply attempts to convert to a date string supported by
@@ -124,16 +171,9 @@ const card = (orig, start = '', end = '', link) => html`
  * @returns {TemplateResult[]} built cards from input matches data
  */
 const cards = (matches, title, details, location) => (
-	matches.map((match) => {
-		const start = match.start.date()
-		const end = match.end ? match.end.date() : ''
-
-		// filter dates from the past
-		if (start.toString() === 'Invalid Date' || end.toString() === 'Invalid Date') return null
-		if (HIDE_PAST_EVENTS && Missive.isPast(start)) return null
-
+	matches.map(({ text, start, end }) => {
 		const link = buildLink(title, start, end, details, location)
-		return card(match.text, start, end, link)
+		return card(text, start, end, link)
 	}).filter(Boolean)
 )
 
@@ -170,11 +210,7 @@ Missive.on('change:conversations', (ids) => {
 					template.innerHTML = message.body
 					const body = template.content.textContent.replace(/\s+/gm, ' ').trim()
 
-					// find dates / times and filter blacklisted matches
-					const matches = chrono.parse(body)
-						.filter(match => !blacklistCaseSensitive.includes(match.text.trim()))
-						.filter(match => !blacklistCaseInsensitive.includes(match.text.trim().toLowerCase()))
-
+					const matches = filterMatches(chrono.parse(body))
 					const cardItems = cards(matches, message.subject, `${reference}\n${body}`)
 
 					// render widget
