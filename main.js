@@ -205,10 +205,7 @@ const sidebar = items => (
 document.querySelector('#reload')
 	.addEventListener('click', () => Missive.reload())
 
-/**
- * triggers each time email is loaded and renders found matches
- */
-Missive.on('change:conversations', (ids) => {
+const handleConversationsChange = (ids) => {
 	Missive.fetchConversations(ids, ['latest_message', 'link'])
 		.then((conversations) => {
 			if (conversations[0]) {
@@ -233,7 +230,13 @@ Missive.on('change:conversations', (ids) => {
 			console.error(`GCalError\n${e.stack}`)
 			Missive.alert({ title: 'error in GCal script', message: e.toString() })
 		})
-})
+}
+
+/**
+ * triggers each time email is loaded and renders found matches
+ */
+Missive.on('change:conversations', handleConversationsChange)
+handleConversationsChange(Missive.state.conversations)
 
 /* eslint-disable max-len */
 /**
