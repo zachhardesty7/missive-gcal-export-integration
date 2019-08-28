@@ -208,9 +208,12 @@ document.querySelector('#reload')
 const handleConversationsChange = (ids) => {
 	Missive.fetchConversations(ids, ['latest_message', 'link'])
 		.then((conversations) => {
-			if (conversations[0]) {
-				const message = conversations[0].latest_message
+			if (conversations && conversations[0]) {
 				const reference = conversations[0].link
+				const message = Array.isArray(conversations[0].latest_message)
+					? conversations[0].latest_message[0]
+					: conversations[0].latest_message
+
 				if (message && message.from_field && conversations.length === 1) {
 					// extract raw text from stringified html provided
 					const template = document.createElement('template')
