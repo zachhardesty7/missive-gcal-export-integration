@@ -125,16 +125,16 @@ const buildLink = (title = '', start = '', end = '', details = '', location = ''
 		endFormatted = formatAsGCalDate(datetime)
 	}
 
-	link.append('action', 'TEMPLATE')
+	link.append('action', 'TEMPLATE') // required
 	link.append('text', title)
 	link.append('dates', `${startFormatted}/${endFormatted}`)
 	link.append('details', details)
 	link.append('location', location)
-	link.append('trp', 'false')
-	link.append('sprop', '')
-	link.append('sprop', 'name:')
+	link.append('trp', 'true') // busy
+	link.append('sprop', 'https://mail.missiveapp.com') // source
+	link.append('sprop', 'name:Missive') // source name
 
-	return `https://calendar.google.com/event?${link.toString()}`
+	return `https://calendar.google.com/render?${link.toString()}`
 }
 
 /**
@@ -167,7 +167,7 @@ const card = (orig, start = '', end = '', link) => html`
 				</p>
 			`}
     </div>
-    <a target="_blank" @click=${() => Missive.openURL(link)} href=${link} class="button">Export</a>
+    <a target="_blank" @click=${() => Missive.openURL(link)} class="button">Export</a>
   </div>
 `
 
