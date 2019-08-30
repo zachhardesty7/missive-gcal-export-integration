@@ -59,8 +59,8 @@ const filterMatches = (matches) => {
 		.filter(({ text }) => !blacklistCaseSensitive.includes(text.trim()))
 		.filter(({ text }) => !blacklistCaseInsensitive.includes(text.trim().toLowerCase()))
 
-		// remove items without valid end datetime
-		.filter(({ start }) => start !== 'Invalid Date')
+		// remove items without valid start datetime
+		.filter(({ start }) => start.toString() !== 'Invalid Date')
 
 		// if enabled, hide datetimes that started in the past
 		.filter(({ start }) => !HIDE_PAST_EVENTS || !Missive.isPast(start))
