@@ -206,13 +206,10 @@ document.querySelector('#reload')
 	.addEventListener('click', () => Missive.reload())
 
 const handleConversationsChange = (ids) => {
-	Missive.fetchConversations(ids, ['latest_message', 'link'])
+	Missive.fetchConversations(ids, ['latest_message', '!latest_message.attachments', 'link'])
 		.then((conversations) => {
 			if (conversations && conversations[0]) {
-				const reference = conversations[0].link
-				const message = Array.isArray(conversations[0].latest_message)
-					? conversations[0].latest_message[0]
-					: conversations[0].latest_message
+				const { link, latest_message: message } = conversations[0]
 
 				if (message && message.from_field && conversations.length === 1) {
 					// extract raw text from stringified html provided
@@ -221,7 +218,7 @@ const handleConversationsChange = (ids) => {
 					const body = template.content.textContent.replace(/\s+/gm, ' ').trim()
 
 					const matches = filterMatches(chrono.parse(body))
-					const details = `<strong>LINK:</strong>\n${reference}${INCLUDE_BODY ? `\n\n<strong>EMAIL:</strong>\n${body}` : ''}`
+					const details = `<strong>LINK:</strong>\n${link}${INCLUDE_BODY ? `\n\n<strong>EMAIL:</strong>\n${body}` : ''}`
 					const cardItems = cards(matches, message.subject, details)
 
 					const results = document.querySelector('#results')
