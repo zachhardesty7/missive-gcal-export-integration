@@ -86,6 +86,21 @@ const filterMatches = (matches) => {
 }
 
 /**
+ * @param {string} str - arbitrary value, usually email body
+ * @returns {string} input without extra whitespace and problematic chars
+ */
+const sterilizeText = str => (
+	str
+		.trim()
+		// eslint-disable-next-line no-irregular-whitespace
+		.replace(/[\t  ]{2,}/gm, ' ') // rm extra spaces
+		// eslint-disable-next-line no-irregular-whitespace
+		.replace(/([\t  ]*\n)+/gm, '\n') // rm blank lines
+		.replace(/@/gm, 'at') // swap at sign for word "at"
+		.replace(/\d{3}-\d{4}/gm, ' ') // hide phone numbers that accidentally trigger
+)
+
+/**
  * simply attempts to convert to a date string supported by
  * Google Calendar with empty string fallback
  *
@@ -215,7 +230,7 @@ const handleConversationsChange = (ids) => {
 					// extract raw text from stringified html provided
 					const template = document.createElement('template')
 					template.innerHTML = message.body
-					const body = template.content.textContent.replace(/\s+/gm, ' ').trim()
+					const body = sterilizeText(template.content.textContent)
 
 					const matches = filterMatches(chrono.parse(body))
 					const details = `<strong>LINK:</strong>\n${link}${INCLUDE_BODY ? `\n\n<strong>EMAIL:</strong>\n${body}` : ''}`
