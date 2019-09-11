@@ -43,6 +43,13 @@ dark
 
 ![sidebar-dark](https://i.imgur.com/aETnd8F.png)
 
+## Known Issues
+
+- rudimentary timezone indicator fix requires manually removing and causes issues when
+  not located in the timezone from the email (i.e. does not localize)
+- most Eastern timezones result in datetime detection failure
+- fails detection if "the 10th" isn't preceded by a day this week (needs custom chrono.js parser feature)
+
 ## Acknowledgements
 
 [chrono](https://github.com/wanasit/chrono) - natural language processing with a focus on dates and

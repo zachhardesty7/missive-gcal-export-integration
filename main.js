@@ -8,6 +8,8 @@ const HIDE_PAST_EVENTS = true
 const AGGRESSIVELY_FILTER_DUPLICATES = true
 // copy email body into Google Calendar event
 const INCLUDE_BODY = false
+// log email body before and after sterilization
+const DEBUG = false
 
 /**
  * strings to ignore when unintentionally picked up by chrono
@@ -28,7 +30,6 @@ const blacklistCaseInsensitive = [
 	// individual month's would nearly never be used as a Google Calendar event
 	'january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december',
 	// weird ones I stumbled on
-	'1-800',
 	'a 12',
 ]
 
@@ -90,14 +91,25 @@ const filterMatches = (matches) => {
  * @returns {string} input without extra whitespace and problematic chars
  */
 const sterilizeText = str => (
+/* eslint-disable no-irregular-whitespace */
 	str
 		.trim()
-		// eslint-disable-next-line no-irregular-whitespace
-		.replace(/[\t  ]{2,}/gm, ' ') // rm extra spaces
-		// eslint-disable-next-line no-irregular-whitespace
-		.replace(/([\t  ]*\n)+/gm, '\n') // rm blank lines
-		.replace(/@/gm, 'at') // swap at sign for word "at"
-		.replace(/\d{3}-\d{4}/gm, ' ') // hide phone numbers that accidentally trigger
+		.replace(/[\t  ]{2,}/gm, ' ') // extra spaces
+		.replace(/([\t  ]*\n)+/gm, '\n') // multiple blank lines
+		.replace(/(@|\|)/gm, 'at') // swap @ and | for word "at"
+		.replace(/[Tt]ime:/gm, ',') // time label
+		// "the 10th" style breaks date func, rm bc usually preceded by weekday
+		.replace(/the \d\d?(st|nd|rd|th)/gm, '')
+		// most US timezone indicators (surrounded by parens)
+		.replace(/[([]?[CEMP][DS]?T[)\]]?/gm, '')
+		// most Europe timezone indicators (surrounded by parens)
+		.replace(/[([]?\w{1,2}[ES]T[)\]]?/gm, '')
+		// UTC or GMT (surrounded by parens)
+		.replace(/[([]?(UTC|GMT)[)\]]?/gm, '')
+		// phone numbers that accidentally trigger
+		.replace(/\d{3}-\d{4}/gm, ' ')
+
+/* eslint-enable no-irregular-whitespace */
 )
 
 /**
@@ -231,6 +243,12 @@ const handleConversationsChange = (ids) => {
 					const template = document.createElement('template')
 					template.innerHTML = message.body
 					const body = sterilizeText(template.content.textContent)
+
+					// log email content before & after sterilization
+					if (DEBUG) {
+						console.log(template.content.textContent)
+						console.log(body)
+					}
 
 					const matches = filterMatches(chrono.parse(body))
 					const details = `<strong>LINK:</strong>\n${link}${INCLUDE_BODY ? `\n\n<strong>EMAIL:</strong>\n${body}` : ''}`
