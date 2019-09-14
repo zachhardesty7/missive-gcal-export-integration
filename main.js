@@ -9,7 +9,7 @@ const AGGRESSIVELY_FILTER_DUPLICATES = true
 // copy email body into Google Calendar event
 const INCLUDE_BODY = false
 // log email body before and after sterilization
-const DEBUG = false
+const DEBUG = true
 
 /**
  * strings to ignore when unintentionally picked up by chrono
@@ -108,6 +108,9 @@ const sterilizeText = str => (
 		.replace(/[([]?(UTC|GMT)[)\]]?/gm, '')
 		// phone numbers that accidentally trigger
 		.replace(/\d{3}-\d{4}/gm, ' ')
+		// time values mess up when only 1 part has minutes
+		.replace(/(?<!\d)(?<!:)(\d\d?)( ?- ?\d\d?:\d\d)/gm, '$1:00$2')
+		.replace(/(\d\d?:\d\d ?- ?\d\d?)(?!:)/gm, '$1:00')
 
 /* eslint-enable no-irregular-whitespace */
 )
