@@ -31,6 +31,7 @@ const blacklistCaseInsensitive = [
 	'january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december',
 	// weird ones I stumbled on
 	'a 12',
+	'a 24',
 ]
 
 /**
@@ -107,7 +108,11 @@ const sterilizeText = str => (
 		// UTC or GMT (surrounded by parens)
 		.replace(/[([]?(UTC|GMT)[)\]]?/gm, '')
 		// phone numbers that accidentally trigger
+		.replace(/\d-\d{4}/gm, ' ')
+		.replace(/\d{3}- ?\d{2}/gm, ' ')
+		.replace(/\d{3}-\d{3}/gm, ' ')
 		.replace(/\d{3}-\d{4}/gm, ' ')
+		.replace(/\d- ?\d-\d{3}/gm, ' ')
 		// time values mess up when only 1 part has minutes
 		.replace(/(?<!\d)(?<!:)(\d\d?)( ?- ?\d\d?:\d\d)/gm, '$1:00$2')
 		.replace(/(\d\d?:\d\d ?- ?\d\d?)(?!:)/gm, '$1:00')
