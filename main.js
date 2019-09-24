@@ -115,7 +115,9 @@ const sterilizeText = str => (
 		.replace(/\d- ?\d-\d{3}/gm, ' ')
 		// time values mess up when only 1 part has minutes
 		.replace(/(?<!\d)(?<!:)(\d\d?)( ?- ?\d\d?:\d\d)/gm, '$1:00$2')
-		.replace(/(\d\d?:\d\d ?- ?\d\d?)(?!:)/gm, '$1:00')
+		.replace(/(\d\d?:\d\d ?- ?\d\d?)(?!\d?:)/gm, '$1:00')
+		// cosmetic fix for strange date display
+		.replace(/\((\d\d?\/\d\d?)\)/gm, ' $1 ')
 
 /* eslint-enable no-irregular-whitespace */
 )
