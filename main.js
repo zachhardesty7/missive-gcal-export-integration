@@ -32,6 +32,7 @@ const blacklistCaseInsensitive = [
 	// weird ones I stumbled on
 	'a 12',
 	'a 24',
+	'DOM',
 ]
 
 /**
@@ -101,10 +102,10 @@ const sterilizeText = str => (
 		.replace(/[Tt]ime:/gm, ',') // time label
 		// "the 10th" style breaks date func, rm bc usually preceded by weekday
 		.replace(/the \d\d?(st|nd|rd|th)/gm, '')
-		// most US timezone indicators (surrounded by parens)
-		.replace(/[([]?[CEMP][DS]?T[)\]]?/gm, '')
-		// most Europe timezone indicators (surrounded by parens)
-		.replace(/[([]?\w{1,2}[ES]T[)\]]?/gm, '')
+		// most US timezone indicators (surrounded by parens or brackets)
+		.replace(/[([][CEMP][DS]?T[)\]]/gm, '')
+		// most Europe timezone indicators (surrounded by parens or brackets)
+		.replace(/[([]\w{1,2}[ES]T[)\]]/gm, '')
 		// UTC or GMT (surrounded by parens)
 		.replace(/[([]?(UTC|GMT)[)\]]?/gm, '')
 		// phone numbers that accidentally trigger
@@ -118,6 +119,8 @@ const sterilizeText = str => (
 		.replace(/(\d\d?:\d\d ?- ?\d\d?)(?!\d?:)/gm, '$1:00')
 		// cosmetic fix for strange date display
 		.replace(/\((\d\d?\/\d\d?)\)/gm, ' $1 ')
+		// fix for missing month in end of date range
+		.replace(/(\d?\d)(\/\d?\d)(-)(\d?\d)/gm, '$1$2 $3 $1/$4')
 
 /* eslint-enable no-irregular-whitespace */
 )
