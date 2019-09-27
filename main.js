@@ -60,7 +60,8 @@ const filterMatches = (matches) => {
 	const filteredMatches = cleanMatches
 		// remove blacklisted items
 		.filter(({ text }) => !blacklistCaseSensitive.includes(text.trim()))
-		.filter(({ text }) => !blacklistCaseInsensitive.includes(text.trim().toLowerCase()))
+		.filter(({ text }) => (
+			!blacklistCaseInsensitive.map(str => str.toLowerCase()).includes(text.trim().toLowerCase())))
 
 		// remove items without valid start datetime
 		.filter(({ start }) => start.toString() !== 'Invalid Date')
