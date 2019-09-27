@@ -45,7 +45,6 @@ dark
 
 ## Known Issues
 
-- does not scroll to top on conversation change
 - rudimentary timezone indicator fix requires manually removing and causes issues when
   not located in the timezone from the email (i.e. does not localize)
 - most Eastern timezones result in datetime detection failure

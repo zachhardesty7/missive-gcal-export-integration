@@ -9,7 +9,7 @@ const AGGRESSIVELY_FILTER_DUPLICATES = true
 // copy email body into Google Calendar event
 const INCLUDE_BODY = false
 // log email body before and after sterilization
-const DEBUG = false
+const DEBUG = true
 
 /**
  * strings to ignore when unintentionally picked up by chrono
@@ -271,6 +271,7 @@ const handleConversationsChange = (ids) => {
 
 					const results = document.querySelector('#results')
 					render(sidebar(cardItems), results)
+					results.scrollIntoView()
 				}
 			}
 
