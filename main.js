@@ -9,7 +9,7 @@ const AGGRESSIVELY_FILTER_DUPLICATES = true
 // copy email body into Google Calendar event
 const INCLUDE_BODY = false
 // log email body before and after sterilization
-const DEBUG = true
+const DEBUG = false
 
 /**
  * strings to ignore when unintentionally picked up by chrono
@@ -249,7 +249,8 @@ document.querySelector('#reload')
 const handleConversationsChange = (ids) => {
 	Missive.fetchConversations(ids, ['latest_message', '!latest_message.attachments', 'link'])
 		.then((conversations) => {
-			if (conversations && conversations[0]) {
+			// single convo loaded, operate normally
+			if (conversations && conversations.length === 1) {
 				const { link, latest_message: message } = conversations[0]
 
 				if (message && message.from_field && conversations.length === 1) {
@@ -272,6 +273,21 @@ const handleConversationsChange = (ids) => {
 					render(sidebar(cardItems), results)
 				}
 			}
+
+			// multiple convos loaded
+			else if (conversations && conversations.length >= 2) {
+				const noSelection = html`<p class="text-large align-center padding-top-large">multiple conversations selected</p>`
+				const results = document.querySelector('#results')
+				render(noSelection, results)
+			}
+
+			// no convo loaded
+			else {
+				const noSelection = html`<p class="text-large align-center padding-top-large">no conversation selected</p>`
+				const results = document.querySelector('#results')
+				render(noSelection, results)
+			}
+
 			return null // required by linter
 		}).catch((e) => {
 			console.error(`GCalError\n${e.stack}`)
