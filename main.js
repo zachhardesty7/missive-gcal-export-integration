@@ -5,7 +5,7 @@ import { html, render } from 'https://unpkg.com/lit-html?module'
 // doesn't make much sense to create a calendar event in the past
 const HIDE_PAST_EVENTS = true
 // also match duplicates via start and end datetime
-const AGGRESSIVELY_FILTER_DUPLICATES = true
+const HIDE_DUPLICATE_EVENTS = true
 // copy email body into Google Calendar event
 const INCLUDE_BODY = false
 // log email body before and after sterilization
@@ -79,7 +79,7 @@ const filterMatches = (matches) => {
   let output = Object.values(matchTable)
 
   // reuse and filter duplicate start/end datetimes
-  if (AGGRESSIVELY_FILTER_DUPLICATES) {
+  if (HIDE_DUPLICATE_EVENTS) {
     matchTable = {}
     output.forEach((match) => {
       const key = match.start + match.end
@@ -210,7 +210,7 @@ const card = (orig, start = '', end = '', link) => html`
         </p>
       `}
     </div>
-    <a target="_blank" @click=${() => Missive.openURL(link)} class="button">Export</a>
+    <a @click=${() => Missive.openURL(link)} class="button">Export</a>
   </div>
 `
 
@@ -298,8 +298,13 @@ const handleConversationsChange = (ids) => {
 Missive.on('change:conversations', handleConversationsChange)
 handleConversationsChange(Missive.state.conversations)
 
-/* eslint-disable max-len */
 /**
  * @typedef {import('lit-html').TemplateResult} TemplateResult
- * @typedef {{ index: number, text: string, tags: object, start: { knownValues: [object],impliedValues: [object] }, end: { knownValues: [object], impliedValues: [object] } }[]} ChronoDates
+ * @typedef {{
+ *  index: number,
+ *  text: string,
+ *  tags: object,
+ *  start: { knownValues: [object],impliedValues: [object] },
+ *  end: { knownValues: [object], impliedValues: [object] }
+ * }[]} ChronoDates
  */

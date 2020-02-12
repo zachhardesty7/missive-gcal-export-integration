@@ -1,6 +1,6 @@
 {
   "name": "missive-gcal-export-integration",
-  "version": "1.9.3",
+  "version": "1.9.4",
   "description": "Adds an integration to the Missive mail app that parses emails for dates and displays them to be exported to Google Calendar if desired.",
   "keywords": [
     "missive",
@@ -10,7 +10,7 @@
   ],
   "homepage": "https://zachhardesty.com/missive",
   "bugs": "https://github.com/zachhardesty7/missive-gcal-export-integration/issues",
-  "main": "dist",
+  "main": "main.js",
   "license": "MIT",
   "author": "Zach Hardesty <hello@zachhardesty.com> (https://zachhardesty.com)",
   "repository": "github:zachhardesty7/missive-gcal-export-integration",
