@@ -9,7 +9,7 @@ const AGGRESSIVELY_FILTER_DUPLICATES = true
 // copy email body into Google Calendar event
 const INCLUDE_BODY = false
 // log email body before and after sterilization
-const DEBUG = true
+const DEBUG = false
 
 /**
  * strings to ignore when unintentionally picked up by chrono
@@ -17,7 +17,7 @@ const DEBUG = true
  * **NOTE** - case sensitive
  */
 const blacklistCaseSensitive = [
-	'sun',
+  'sun',
 ]
 
 /**
@@ -26,13 +26,13 @@ const blacklistCaseSensitive = [
  * **NOTE** - case insensitive
  */
 const blacklistCaseInsensitive = [
-	'now', 'today',
-	// individual month's would nearly never be used as a Google Calendar event
-	'january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december',
-	// weird ones I stumbled on
-	'a 12',
-	'a 24',
-	'DOM',
+  'now', 'today',
+  // individual month's would nearly never be used as a Google Calendar event
+  'january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december',
+  // weird ones I stumbled on
+  'a 12',
+  'a 24',
+  'DOM',
 ]
 
 /**
@@ -44,84 +44,86 @@ const blacklistCaseInsensitive = [
  * @returns {ChronoDates} shorter array than input (w/o meta info for start/end)
  */
 const filterMatches = (matches) => {
-	const cleanMatches = matches.map((match) => {
-		const clone = { ...match }
+  const cleanMatches = matches.map((match) => {
+    const clone = { ...match }
 
-		// convert match info to datetime string
-		clone.start = clone.start.date()
-		clone.end = clone.end ? clone.end.date() : ''
+    // convert match info to datetime string
+    clone.start = clone.start.date()
+    clone.end = clone.end ? clone.end.date() : ''
 
-		// hide invalid end values
-		if (clone.end === 'Invalid Date') clone.end = ''
+    // hide invalid end values
+    if (clone.end === 'Invalid Date') clone.end = ''
 
-		return clone
-	})
+    return clone
+  })
 
-	const filteredMatches = cleanMatches
-		// remove blacklisted items
-		.filter(({ text }) => !blacklistCaseSensitive.includes(text.trim()))
-		.filter(({ text }) => (
-			!blacklistCaseInsensitive.map(str => str.toLowerCase()).includes(text.trim().toLowerCase())))
+  const filteredMatches = cleanMatches
+  // remove blacklisted items
+    .filter(({ text }) => !blacklistCaseSensitive.includes(text.trim()))
+    .filter(({ text }) => (
+      !blacklistCaseInsensitive
+        .map((str) => str.toLowerCase())
+        .includes(text.trim().toLowerCase())))
 
-		// remove items without valid start datetime
-		.filter(({ start }) => start.toString() !== 'Invalid Date')
+  // remove items without valid start datetime
+    .filter(({ start }) => start.toString() !== 'Invalid Date')
 
-		// if enabled, hide datetimes that started in the past
-		.filter(({ start }) => !HIDE_PAST_EVENTS || !Missive.isPast(start))
+  // if enabled, hide datetimes that started in the past
+    .filter(({ start }) => !HIDE_PAST_EVENTS || !Missive.isPast(start))
 
-	// convert from arr -> obj -> arr to remove identical text datetimes
-	let matchTable = {}
-	filteredMatches.forEach((match) => {
-		if (!matchTable[match.text]) matchTable[match.text] = match
-	})
-	let output = Object.values(matchTable)
+  // convert from arr -> obj -> arr to remove identical text datetimes
+  let matchTable = {}
+  filteredMatches.forEach((match) => {
+    if (!matchTable[match.text]) matchTable[match.text] = match
+  })
+  let output = Object.values(matchTable)
 
-	// reuse and filter duplicate start/end datetimes
-	if (AGGRESSIVELY_FILTER_DUPLICATES) {
-		matchTable = {}
-		output.forEach((match) => {
-			const key = match.start + match.end
-			if (!matchTable[key]) matchTable[key] = match
-		})
-		output = Object.values(matchTable)
-	}
+  // reuse and filter duplicate start/end datetimes
+  if (AGGRESSIVELY_FILTER_DUPLICATES) {
+    matchTable = {}
+    output.forEach((match) => {
+      const key = match.start + match.end
+      if (!matchTable[key]) matchTable[key] = match
+    })
+    output = Object.values(matchTable)
+  }
 
-	return output
+  return output
 }
 
 /**
  * @param {string} str - arbitrary value, usually email body
  * @returns {string} input without extra whitespace and problematic chars
  */
-const sterilizeText = str => (
 /* eslint-disable no-irregular-whitespace */
-	str
-		.trim()
-		.replace(/[\t  ]{2,}/gm, ' ') // extra spaces
-		.replace(/([\t  ]*\n)+/gm, '\n') // multiple blank lines
-		.replace(/(@|\|)/gm, 'at') // swap @ and | for word "at"
-		.replace(/[Tt]ime:/gm, ',') // time label
-		// "the 10th" style breaks date func, rm bc usually preceded by weekday
-		.replace(/the \d\d?(st|nd|rd|th)/gm, '')
-		// most US timezone indicators (surrounded by parens or brackets)
-		.replace(/[([][CEMP][DS]?T[)\]]/gm, '')
-		// most Europe timezone indicators (surrounded by parens or brackets)
-		.replace(/[([]\w{1,2}[ES]T[)\]]/gm, '')
-		// UTC or GMT (surrounded by parens)
-		.replace(/[([]?(UTC|GMT)[)\]]?/gm, '')
-		// phone numbers that accidentally trigger
-		.replace(/\d-\d{4}/gm, ' ')
-		.replace(/\d{3}- ?\d{2}/gm, ' ')
-		.replace(/\d{3}-\d{3}/gm, ' ')
-		.replace(/\d{3}-\d{4}/gm, ' ')
-		.replace(/\d- ?\d-\d{3}/gm, ' ')
-		// time values mess up when only 1 part has minutes
-		.replace(/(?<!\d)(?<!:)(\d\d?)( ?- ?\d\d?:\d\d)/gm, '$1:00$2')
-		.replace(/(\d\d?:\d\d ?- ?\d\d?)(?!\d?:)/gm, '$1:00')
-		// cosmetic fix for strange date display
-		.replace(/\((\d\d?\/\d\d?)\)/gm, ' $1 ')
-		// fix for missing month in end of date range
-		.replace(/(\d?\d)(\/\d?\d)(-)(\d?\d)/gm, '$1$2 $3 $1/$4')
+const sterilizeText = (str) => (
+  str
+    .trim()
+    .replace(/[\t  ]{2,}/gm, ' ') // extra spaces
+    .replace(/([\t  ]*\n)+/gm, '\n') // multiple blank lines
+    .replace(/(@|\|)/gm, 'at') // swap @ and | for word "at"
+    .replace(/[Tt]ime:/gm, ',') // time label
+  // "the 10th" style breaks date func, rm bc usually preceded by weekday
+    .replace(/the \d\d?(st|nd|rd|th)/gm, '')
+  // most US timezone indicators (surrounded by parens or brackets)
+    .replace(/[([][CEMP][DS]?T[)\]]/gm, '')
+  // most Europe timezone indicators (surrounded by parens or brackets)
+    .replace(/[([]\w{1,2}[ES]T[)\]]/gm, '')
+  // UTC or GMT (surrounded by parens)
+    .replace(/[([]?(UTC|GMT)[)\]]?/gm, '')
+  // phone numbers that accidentally trigger
+    .replace(/\d-\d{4}/gm, ' ')
+    .replace(/\d{3}- ?\d{2}/gm, ' ')
+    .replace(/\d{3}-\d{3}/gm, ' ')
+    .replace(/\d{3}-\d{4}/gm, ' ')
+    .replace(/\d- ?\d-\d{3}/gm, ' ')
+  // time values mess up when only 1 part has minutes
+    .replace(/(?<!\d)(?<!:)(\d\d?)( ?- ?\d\d?:\d\d)/gm, '$1:00$2')
+    .replace(/(\d\d?:\d\d ?- ?\d\d?)(?!\d?:)/gm, '$1:00')
+  // cosmetic fix for strange date display
+    .replace(/\((\d\d?\/\d\d?)\)/gm, ' $1 ')
+  // fix for missing month in end of date range
+    .replace(/(\d?\d)(\/\d?\d)(-)(\d?\d)/gm, '$1$2 $3 $1/$4')
 
 /* eslint-enable no-irregular-whitespace */
 )
@@ -134,12 +136,12 @@ const sterilizeText = str => (
  * @returns {string} GCal supported date string or empty string
  */
 const formatAsGCalDate = (str = '') => (
-	(
-		str &&
+  (
+    str &&
     (new Date(str)) &&
     (new Date(str)).toISOString() &&
     (new Date(str)).toISOString().replace(/-|:|\.\d{3}/g, '')
-	) || ''
+  ) || ''
 )
 
 /**
@@ -154,28 +156,28 @@ const formatAsGCalDate = (str = '') => (
  * @returns {string} encoded URL of endpoint and query args to target
  */
 const buildLink = (title = '', start = '', end = '', details = '', location = '') => {
-	const link = new URLSearchParams()
-	const startFormatted = formatAsGCalDate(start)
-	let endFormatted = formatAsGCalDate(end)
+  const link = new URLSearchParams()
+  const startFormatted = formatAsGCalDate(start)
+  let endFormatted = formatAsGCalDate(end)
 
-	// fill in empty end datetime as 1 hour after start datetime
-	if (!endFormatted) {
-		const datetime = new Date(start)
-		datetime.setHours(datetime.getHours() + 1)
+  // fill in empty end datetime as 1 hour after start datetime
+  if (!endFormatted) {
+    const datetime = new Date(start)
+    datetime.setHours(datetime.getHours() + 1)
 
-		endFormatted = formatAsGCalDate(datetime)
-	}
+    endFormatted = formatAsGCalDate(datetime)
+  }
 
-	link.append('action', 'TEMPLATE') // required
-	link.append('text', title)
-	link.append('dates', `${startFormatted}/${endFormatted}`)
-	link.append('details', details)
-	link.append('location', location)
-	link.append('trp', 'true') // busy
-	link.append('sprop', 'https://mail.missiveapp.com') // source
-	link.append('sprop', 'name:Missive') // source name
+  link.append('action', 'TEMPLATE') // required
+  link.append('text', title)
+  link.append('dates', `${startFormatted}/${endFormatted}`)
+  link.append('details', details)
+  link.append('location', location)
+  link.append('trp', 'true') // busy
+  link.append('sprop', 'https://mail.missiveapp.com') // source
+  link.append('sprop', 'name:Missive') // source name
 
-	return `https://calendar.google.com/render?${link.toString()}`
+  return `https://calendar.google.com/render?${link.toString()}`
 }
 
 /**
@@ -192,21 +194,21 @@ const card = (orig, start = '', end = '', link) => html`
   <div class="card shadow padding-xlarge">
     <h3 class="title text-600">${orig}</h3>
     <div class="margin-top-xlarge margin-bottom-xlarge">
-			<p>
-				<span class="text-c label-date">
-					<!-- REVIEW: keep 'At' label? -->
-					${!end ? 'At: ' : 'Start: '}
-				</span>
-				${start}
-			</p>
-			${end && html`
-				<p>
-					<span class="text-c label-date">
-						End: 
-					</span>
-					${end}
-				</p>
-			`}
+      <p>
+        <span class="text-c label-date">
+          <!-- REVIEW: keep 'At' label? -->
+          ${!end ? 'At: ' : 'Start: '}
+        </span>
+        ${start}
+      </p>
+      ${end && html`
+        <p>
+          <span class="text-c label-date">
+            End: 
+          </span>
+          ${end}
+        </p>
+      `}
     </div>
     <a target="_blank" @click=${() => Missive.openURL(link)} class="button">Export</a>
   </div>
@@ -223,77 +225,71 @@ const card = (orig, start = '', end = '', link) => html`
  * @returns {TemplateResult[]} built cards from input matches data
  */
 const cards = (matches, title, details, location) => (
-	matches.map(({ text, start, end }) => {
-		const link = buildLink(title, start, end, details, location)
-		return card(text, start, end, link)
-	}).filter(Boolean)
+  matches.map(({ text, start, end }) => {
+    const link = buildLink(title, start, end, details, location)
+    return card(text, start, end, link)
+  }).filter(Boolean)
 )
 
 /**
  * @param {TemplateResult[]} items - cards to be rendered, any node
  * @returns {TemplateResult} sidebar with appropriate header and cards
  */
-const sidebar = items => (
-	items.length !== 0
-		? html`
-			<h2 class="text-xlarge align-center padding-top-medium text-600">detected events</h2>
-			${items}
-		`
-		: html`<p class="text-large align-center padding-top-large">no matches</p>`
+const sidebar = (items) => (
+  items.length !== 0
+    ? html`
+      <h2 class="text-xlarge align-center padding-top-medium text-600">detected events</h2>
+      ${items}
+    `
+    : html`<p class="text-large align-center padding-top-large">no matches</p>`
 )
 
 // activate reload button
 document.querySelector('#reload')
-	.addEventListener('click', () => Missive.reload())
+  .addEventListener('click', () => Missive.reload())
 
 const handleConversationsChange = (ids) => {
-	Missive.fetchConversations(ids, ['latest_message', '!latest_message.attachments', 'link'])
-		.then((conversations) => {
-			// single convo loaded, operate normally
-			if (conversations && conversations.length === 1) {
-				const { link, latest_message: message } = conversations[0]
+  Missive.fetchConversations(ids, ['latest_message', '!latest_message.attachments', 'link'])
+    .then((conversations) => {
+      // single convo loaded, operate normally
+      if (conversations && conversations.length === 1) {
+        const { link, latest_message: message } = conversations[0]
 
-				if (message && message.from_field && conversations.length === 1) {
-					// extract raw text from stringified html provided
-					const template = document.createElement('template')
-					template.innerHTML = message.body
-					const body = sterilizeText(template.content.textContent)
+        if (message && message.from_field && conversations.length === 1) {
+          // extract raw text from stringified html provided
+          const template = document.createElement('template')
+          template.innerHTML = message.body
+          const body = sterilizeText(template.content.textContent)
 
-					// log email content before & after sterilization
-					if (DEBUG) {
-						console.log(template.content.textContent)
-						console.log(body)
-					}
+          // log email content before & after sterilization
+          if (DEBUG) {
+            console.log(template.content.textContent)
+            console.log(body)
+          }
 
-					const matches = filterMatches(chrono.parse(body))
-					const details = `<strong>LINK:</strong>\n${link}${INCLUDE_BODY ? `\n\n<strong>EMAIL:</strong>\n${body}` : ''}`
-					const cardItems = cards(matches, message.subject, details)
+          const matches = filterMatches(chrono.parse(body))
+          const details = `<strong>LINK:</strong>\n${link}${INCLUDE_BODY ? `\n\n<strong>EMAIL:</strong>\n${body}` : ''}`
+          const cardItems = cards(matches, message.subject, details)
 
-					const results = document.querySelector('#results')
-					render(sidebar(cardItems), results)
-					results.scrollIntoView()
-				}
-			}
+          const results = document.querySelector('#results')
+          render(sidebar(cardItems), results)
+          results.scrollIntoView()
+        }
+      } else if (conversations && conversations.length >= 2) { // multiple convos loaded
+        const noSelection = html`<p class="text-large align-center padding-top-large">multiple conversations selected</p>`
+        const results = document.querySelector('#results')
+        render(noSelection, results)
+      } else { // no convo loaded
+        const noSelection = html`<p class="text-large align-center padding-top-large">no conversation selected</p>`
+        const results = document.querySelector('#results')
+        render(noSelection, results)
+      }
 
-			// multiple convos loaded
-			else if (conversations && conversations.length >= 2) {
-				const noSelection = html`<p class="text-large align-center padding-top-large">multiple conversations selected</p>`
-				const results = document.querySelector('#results')
-				render(noSelection, results)
-			}
-
-			// no convo loaded
-			else {
-				const noSelection = html`<p class="text-large align-center padding-top-large">no conversation selected</p>`
-				const results = document.querySelector('#results')
-				render(noSelection, results)
-			}
-
-			return null // required by linter
-		}).catch((e) => {
-			console.error(`GCalError\n${e.stack}`)
-			Missive.alert({ title: 'error in GCal script', message: e.toString() })
-		})
+      return null // required by linter
+    }).catch((e) => {
+      console.error(`GCalError\n${e.stack}`)
+      Missive.alert({ title: 'error in GCal script', message: e.toString() })
+    })
 }
 
 /**
