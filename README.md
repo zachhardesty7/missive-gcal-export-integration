@@ -49,6 +49,8 @@ dark
   not located in the timezone from the email (i.e. does not localize)
 - most Eastern timezones result in datetime detection failure
 - fails detection if "the 10th" isn't preceded by a day this week (needs custom chrono.js parser feature)
+- temp replacement since localhost.me ent down, investigate
+  [tunnel-tool](https://github.com/vicjicaman/tunnel-tool) and [DIY ngrok](https://igauravsehrawat.com/build-your-own-ngrok-4-easy-steps/)
 
 ## Acknowledgements
 
