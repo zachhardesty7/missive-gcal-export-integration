@@ -9,16 +9,19 @@ automatically open Google Calendar's "New Event" page and allow you to customize
 ## Deploying
 
 Three files (`index.html`, `main.js`,
-`theme.css`) need to be deployed to a server that the Missive app can reach. Any of the following
+`theme.css`) need to be deployed to a server that the Missive app can reach. Any one of the following
 options will work:
 
-- Instantly clone/fork and deploy this repo from your Github\
+- Instantly clone/fork this repo to your Github and deploy it to Netlify \
 [![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/zachhardesty7/missive-gcal-export-integration)
-- A sample is deployed on [my netlify account](https://gcal.netlify.com/)
-- Run the integration from source on a local server by executing `yarn
-start` after changing the text following the `tunnel` command [on line 21 of `package.json`](package.json#L21) from `--subdomain
-missive-gcal` to `--subdomain [YOUR TEXT]`. The local server sometimes fails to start due to a bug
-with `localtunnel`, just run `yarn start` again.
+- Use the instance that's deployed on [my netlify account](https://gcal.netlify.com/)
+- Run the integration from source on a local server
+  - change the text following the `tunnel` command
+    [on line 21 of `package.json`](package.json#L21)
+    from `--subdomain missive-gcal` to `--subdomain [ANY TEXT]`
+  - execute `yarn start`
+    (**NOTE:** The local server sometimes fails to start due
+    to a bug with `localtunnel`, restarting seems to fix it)
 
 ## Activating the Integration
 
@@ -27,7 +30,7 @@ with `localtunnel`, just run `yarn start` again.
 - click `Integrations` in the flyover menu
 - click `Add integration` at the bottom of the modal
 - select the `Custom` option with a gear at the bottom of the list
-- enter `Name` & `iFrame URL` as...
+- fill in the `Name` & `iFrame URL` fields with...
   - Name: `Google Calendar Export`
   - iFrame URL: `https://[YOUR TEXT].localtunnel.me` or `https://gcal.netlify.com` or url of
     your server or Netlify URL that's hosting the previously mentioned 3 files
@@ -35,13 +38,9 @@ with `localtunnel`, just run `yarn start` again.
 
 ## Preview
 
-light
-
-![sidebar-light](https://i.imgur.com/KTrw9or.png)
-
-dark
-
-![sidebar-dark](https://i.imgur.com/aETnd8F.png)
+| light                                             | dark                                             |
+| ------------------------------------------------- | ------------------------------------------------ |
+| ![sidebar-light](https://i.imgur.com/KTrw9or.png) | ![sidebar-dark](https://i.imgur.com/aETnd8F.png) |
 
 ## Known Issues
 

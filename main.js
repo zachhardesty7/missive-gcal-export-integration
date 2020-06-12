@@ -33,6 +33,7 @@ const blacklistCaseInsensitive = [
   'a 12',
   'a 24',
   'DOM',
+  'an SEC',
 ]
 
 /**
@@ -204,7 +205,7 @@ const card = (orig, start = '', end = '', link) => html`
       ${end && html`
         <p>
           <span class="text-c label-date">
-            End: 
+            End:
           </span>
           ${end}
         </p>
