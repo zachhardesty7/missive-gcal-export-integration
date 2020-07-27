@@ -74,7 +74,6 @@ const filterMatches = (matches) => {
     .filter(
       ({ text }) =>
         !blacklistCaseInsensitive
-          .values()
           .map((str) => str.toLowerCase())
           .includes(text.trim().toLowerCase())
     )
