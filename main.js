@@ -26,6 +26,8 @@ const blacklistCaseSensitive = new Set(["sun"])
 const blacklistCaseInsensitive = [
   "now",
   "today",
+  "24 hours a day",
+  "7 days a week",
   // individual month's would nearly never be used as a Google Calendar event
   "january",
   "february",
@@ -105,15 +107,14 @@ const filterMatches = (matches) => {
 }
 
 /**
+ * parse text to remove char sequences that cause false positives in Chrono
+ *
  * @param {string} str - arbitrary value, usually email body
  * @returns {string} input without extra whitespace and problematic chars
  */
 /* eslint-disable no-irregular-whitespace */
 const sterilizeText = (str) =>
   str
-    .trim()
-    .replace(/[\t  ]{2,}/gm, " ") // extra spaces
-    .replace(/([\t  ]*\n)+/gm, "\n") // multiple blank lines
     .replace(/(@|\|)/gm, "at") // swap @ and | for word "at"
     .replace(/[Tt]ime:/gm, ",") // time label
     // "the 10th" style breaks date func, rm bc usually preceded by weekday
@@ -124,12 +125,18 @@ const sterilizeText = (str) =>
     .replace(/[([]\w{1,2}[ES]T[)\]]/gm, "")
     // UTC or GMT (surrounded by parens)
     .replace(/[([]?(UTC|GMT)[)\]]?/gm, "")
+    // REVIEW: possibly overzealous phone num filtering
     // phone numbers that accidentally trigger
+    .replace(/\+?\d{1,3}-\d{3}-\d{3}-\d{4}/gm, " ") // int'l
     .replace(/\d-\d{4}/gm, " ")
     .replace(/\d{3}- ?\d{2}/gm, " ")
     .replace(/\d{3}-\d{3}/gm, " ")
     .replace(/\d{3}-\d{4}/gm, " ")
     .replace(/\d- ?\d-\d{3}/gm, " ")
+    // fix whitespace
+    .trim()
+    .replace(/[\t  ]{2,}/gm, " ") // extra spaces
+    .replace(/([\t  ]*\n)+/gm, "\n") // multiple blank lines
     // time values mess up when only 1 part has minutes
     .replace(/(?<!\d)(?<!:)(\d\d?)( ?- ?\d\d?:\d\d)/gm, "$1:00$2")
     .replace(/(\d\d?:\d\d ?- ?\d\d?)(?!\d?:)/gm, "$1:00")
@@ -206,7 +213,7 @@ const buildLink = (
  * @param {string} link - Google Calendar auto-create event link for button
  * @returns {TemplateResult} template to be rendered into html of detected info
  */
-const card = (orig, start = "", end = "", link) => html`
+const card = (orig, start = "", end = "", link = "#") => html`
   <div class="card shadow padding-xlarge">
     <h3 class="title text-600">${orig}</h3>
     <div class="margin-top-xlarge margin-bottom-xlarge">
@@ -291,7 +298,15 @@ const handleConversationsChange = (ids) => {
             console.log(body)
           }
 
-          const matches = filterMatches(chrono.parse(body))
+          const allMatches = chrono.parse(body)
+          const matches = filterMatches(allMatches)
+
+          // log matches before & after manual filtering
+          if (DEBUG) {
+            console.log("allMatches", allMatches)
+            console.log("matches", matches)
+          }
+
           const details = `<strong>LINK:</strong>\n${link}${
             INCLUDE_BODY ? `\n\n<strong>EMAIL:</strong>\n${body}` : ""
           }`
@@ -301,8 +316,7 @@ const handleConversationsChange = (ids) => {
           render(sidebar(cardItems), results)
           results.scrollIntoView()
         }
-      }
-      if (conversations && conversations.length >= 2) {
+      } else if (conversations && conversations.length >= 2) {
         // multiple convos loaded
         const noSelection = html`<p
           class="text-large align-center padding-top-large"
