@@ -227,9 +227,7 @@ const card = (orig, start = "", end = "", link = "#") => html`
       ${end &&
       html`
         <p>
-          <span class="text-c label-date">
-            End:
-          </span>
+          <span class="text-c label-date">End:</span>
           ${end}
         </p>
       `}
@@ -283,6 +281,8 @@ const handleConversationsChange = (ids) => {
   ])
     .then((conversations) => {
       // single convo loaded, operate normally
+      const results = document.querySelector("#results")
+
       if (conversations && conversations.length === 1) {
         const { link, latest_message: message } = conversations[0]
 
@@ -312,19 +312,18 @@ const handleConversationsChange = (ids) => {
           }`
           const cardItems = cards(matches, message.subject, details)
 
-          const results = document.querySelector("#results")
           render(sidebar(cardItems), results)
           results.scrollIntoView()
         }
       } else if (conversations && conversations.length >= 2) {
         // multiple convos loaded
-        const noSelection = html`<p
+        const multipleSelections = html`<p
           class="text-large align-center padding-top-large"
         >
           multiple conversations selected
         </p>`
-        const results = document.querySelector("#results")
-        render(noSelection, results)
+
+        render(multipleSelections, results)
       } else {
         // no convo loaded
         const noSelection = html`<p
@@ -332,7 +331,7 @@ const handleConversationsChange = (ids) => {
         >
           no conversation selected
         </p>`
-        const results = document.querySelector("#results")
+
         render(noSelection, results)
       }
 
