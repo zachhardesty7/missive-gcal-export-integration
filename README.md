@@ -70,4 +70,10 @@ server
 [npm-run-all](https://github.com/mysticatea/npm-run-all) - run the server and the tunnel in parallel
 in 1 terminal
 
-*Copyright (c) 2019 || Zach Hardesty || [zachhardesty.com](https://zachhardesty.com)*
+[missive-style-guide](https://integrations.missiveapp.com/styleguide/) - css classes
+used to make this integration look first-party
+
+[missive-javascript-api](https://missiveapp.com/help/api-documentation/iframe-integrations-api) -
+all of the functions come from here to hook into Missive
+
+*Copyright (c) 2020 || Zach Hardesty || [zachhardesty.com](https://zachhardesty.com)*
