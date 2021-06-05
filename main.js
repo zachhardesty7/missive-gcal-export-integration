@@ -316,9 +316,10 @@ const handleConversationsChange = (ids) => {
             console.log("matches", matches)
           }
 
-          const details = `<strong>LINK:</strong>\n${link}${
-            INCLUDE_BODY ? `\n\n<strong>EMAIL:</strong>\n${body}` : ""
-          }`
+          const emailBody = INCLUDE_BODY
+            ? `\n\n<strong>EMAIL:</strong>\n${body}`
+            : ""
+          const details = `<strong>LINK:</strong>\n${link}${emailBody}`
           const cardItems = cards(matches, message.subject, details)
 
           render(sidebar(cardItems), results)
