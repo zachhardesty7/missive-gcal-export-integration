@@ -1,4 +1,5 @@
 .support-icon {
+  cursor: pointer;
   position: absolute;
   right: 1em;
 }

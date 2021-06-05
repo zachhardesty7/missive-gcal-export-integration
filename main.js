@@ -273,6 +273,15 @@ document
   .querySelector("#reload")
   .addEventListener("click", () => Missive.reload())
 
+// activate github button
+document
+  .querySelector(".support-icon")
+  .addEventListener("click", () =>
+    Missive.openURL(
+      "https://github.com/zachhardesty7/missive-gcal-export-integration"
+    )
+  )
+
 const handleConversationsChange = (ids) => {
   Missive.fetchConversations(ids, [
     "latest_message",
