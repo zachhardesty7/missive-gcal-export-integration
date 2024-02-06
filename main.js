@@ -1,6 +1,9 @@
 /* global Missive chrono */
 // eslint-disable-next-line import/no-unresolved
-import { html, render } from "https://unpkg.com/lit-html?module"
+import {
+  html,
+  render,
+} from "https://unpkg.com/lit-html@2.8.0/lit-html.js?module"
 
 // doesn't make much sense to create a calendar event in the past
 const HIDE_PAST_EVENTS = true
