@@ -29,6 +29,7 @@ const blacklistCaseSensitive = new Set(["sun"])
 const blacklistCaseInsensitive = [
   "now",
   "today",
+  "night",
   "24 hours a day",
   "7 days a week",
   // individual month's would nearly never be used as a Google Calendar event
@@ -274,12 +275,12 @@ const sidebar = (items) =>
 // activate reload button
 document
   .querySelector("#reload")
-  .addEventListener("click", () => Missive.reload())
+  ?.addEventListener("click", () => Missive.reload())
 
 // activate github button
 document
   .querySelector(".support-icon")
-  .addEventListener("click", () =>
+  ?.addEventListener("click", () =>
     Missive.openURL(
       "https://github.com/zachhardesty7/missive-gcal-export-integration"
     )
@@ -326,7 +327,7 @@ const handleConversationsChange = (ids) => {
           const cardItems = cards(matches, message.subject, details)
 
           render(sidebar(cardItems), results)
-          results.scrollIntoView()
+          results?.scrollIntoView()
         }
       } else if (conversations && conversations.length >= 2) {
         // multiple convos loaded
