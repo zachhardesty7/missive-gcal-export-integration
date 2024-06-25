@@ -32,6 +32,7 @@ const blacklistCaseInsensitive = [
   "night",
   "24 hours a day",
   "7 days a week",
+  "a minute",
   // individual month's would nearly never be used as a Google Calendar event
   "january",
   "february",
