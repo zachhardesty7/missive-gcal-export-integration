@@ -28,10 +28,18 @@ const blacklistCaseInsensitive = [
   "now",
   "today",
   "night",
+  // TODO: convert to regex targetting any number <= 24
   "24 hours a day",
+  // TODO: convert to regex targetting any number <= 168
+  "40 hours a week",
+  // TODO: convert to regex targetting any number <= 7
   "7 days a week",
   "a minute",
+  "a few minutes",
+  "a second",
+  "a few seconds",
   // individual month's would nearly never be used as a Google Calendar event
+  // REVIEW: consider allowing months
   "january",
   "february",
   "march",
@@ -45,10 +53,24 @@ const blacklistCaseInsensitive = [
   "november",
   "december",
   // weird ones I stumbled on
+  // TODO: should probably be any number <= 24
   "a 12",
   "a 24",
+  "Sam",
+  "sex",
   "DOM",
   "an SEC",
+  // TODO: convert to regexes
+  // should probably be any number <= 24
+  // "9HP",
+  // should probably be any number <= 24
+  // "19:",
+  // gets parsed as 20:14, should probably be any number with 4 digits
+  // "a 2014",
+  // gets parsed as 20:19-20:20
+  // "2019 to 2020",
+  // gets parsed as hours, should rm any "to" range
+  // "15 to 20",
 ]
 
 /**
