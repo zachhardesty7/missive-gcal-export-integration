@@ -1,9 +1,6 @@
 /* global Missive chrono */
-// eslint-disable-next-line import/no-unresolved
-import {
-  html,
-  render,
-} from "https://unpkg.com/lit-html@2.8.0/lit-html.js?module"
+
+import { html, render } from "https://unpkg.com/lit-html@2.8.0/lit-html.js?module"
 
 // doesn't make much sense to create a calendar event in the past
 const HIDE_PAST_EVENTS = true
@@ -54,9 +51,9 @@ const blacklistCaseInsensitive = [
 ]
 
 /**
- * filters out certain text matches if any of the (enabled) following are true:
- * case sensitive or insensitive blacklisted, start is 'Invalid Date' when parsing,
- * event starts in the past, duplicate text, duplicate start and end time
+ * filters out certain text matches if any of the (enabled) following are true: case
+ * sensitive or insensitive blacklisted, start is 'Invalid Date' when parsing, event
+ * starts in the past, duplicate text, duplicate start and end time
  *
  * @param {ChronoDates} matches - list of matches returned by Chrono
  * @returns {ChronoDates} shorter array than input (w/o meta info for start/end)
@@ -70,7 +67,9 @@ const filterMatches = (matches) => {
     clone.end = clone.end ? clone.end.date() : ""
 
     // hide invalid end values
-    if (clone.end === "Invalid Date") clone.end = ""
+    if (clone.end === "Invalid Date") {
+      clone.end = ""
+    }
 
     return clone
   })
@@ -82,7 +81,7 @@ const filterMatches = (matches) => {
       ({ text }) =>
         !blacklistCaseInsensitive
           .map((str) => str.toLowerCase())
-          .includes(text.trim().toLowerCase())
+          .includes(text.trim().toLowerCase()),
     )
 
     // remove items without valid start datetime
@@ -93,18 +92,22 @@ const filterMatches = (matches) => {
 
   // convert from arr -> obj -> arr to remove identical text datetimes
   let matchTable = {}
-  filteredMatches.forEach((match) => {
-    if (!matchTable[match.text]) matchTable[match.text] = match
-  })
+  for (const match of filteredMatches) {
+    if (!matchTable[match.text]) {
+      matchTable[match.text] = match
+    }
+  }
   let output = Object.values(matchTable)
 
   // reuse and filter duplicate start/end datetimes
   if (HIDE_DUPLICATE_EVENTS) {
     matchTable = {}
-    output.forEach((match) => {
+    for (const match of output) {
       const key = match.start + match.end
-      if (!matchTable[key]) matchTable[key] = match
-    })
+      if (!matchTable[key]) {
+        matchTable[key] = match
+      }
+    }
     output = Object.values(matchTable)
   }
 
@@ -120,41 +123,41 @@ const filterMatches = (matches) => {
 /* eslint-disable no-irregular-whitespace */
 const sterilizeText = (str) =>
   str
-    .replace(/(@|\|)/gm, "at") // swap @ and | for word "at"
-    .replace(/[Tt]ime:/gm, ",") // time label
+    .replaceAll(/(@|\|)/gm, "at") // swap @ and | for word "at"
+    .replaceAll(/[Tt]ime:/gm, ",") // time label
     // "the 10th" style breaks date func, rm bc usually preceded by weekday
-    .replace(/the \d\d?(st|nd|rd|th)/gm, "")
+    .replaceAll(/the \d\d?(st|nd|rd|th)/gm, "")
     // most US timezone indicators (surrounded by parens or brackets)
-    .replace(/[([][CEMP][DS]?T[)\]]/gm, "")
+    .replaceAll(/[([][CEMP][DS]?T[)\]]/gm, "")
     // most Europe timezone indicators (surrounded by parens or brackets)
-    .replace(/[([]\w{1,2}[ES]T[)\]]/gm, "")
+    .replaceAll(/[([]\w{1,2}[ES]T[)\]]/gm, "")
     // UTC or GMT (surrounded by parens)
-    .replace(/[([]?(UTC|GMT)[)\]]?/gm, "")
+    .replaceAll(/[([]?(UTC|GMT)[)\]]?/gm, "")
     // REVIEW: possibly overzealous phone num filtering
     // phone numbers that accidentally trigger
-    .replace(/\+?\d{1,3}-\d{3}-\d{3}-\d{4}/gm, " ") // int'l
-    .replace(/\d-\d{4}/gm, " ")
-    .replace(/\d{3}- ?\d{2}/gm, " ")
-    .replace(/\d{3}-\d{3}/gm, " ")
-    .replace(/\d{3}-\d{4}/gm, " ")
-    .replace(/\d- ?\d-\d{3}/gm, " ")
+    .replaceAll(/\+?\d{1,3}-\d{3}-\d{3}-\d{4}/gm, " ") // int'l
+    .replaceAll(/\d-\d{4}/gm, " ")
+    .replaceAll(/\d{3}- ?\d{2}/gm, " ")
+    .replaceAll(/\d{3}-\d{3}/gm, " ")
+    .replaceAll(/\d{3}-\d{4}/gm, " ")
+    .replaceAll(/\d- ?\d-\d{3}/gm, " ")
     // fix whitespace
     .trim()
-    .replace(/[\t  ]{2,}/gm, " ") // extra spaces
-    .replace(/([\t  ]*\n)+/gm, "\n") // multiple blank lines
+    .replaceAll(/[\t  ]{2,}/gm, " ") // extra spaces
+    .replaceAll(/([\t  ]*\n)+/gm, "\n") // multiple blank lines
     // time values mess up when only 1 part has minutes
-    .replace(/(?<!\d)(?<!:)(\d\d?)( ?- ?\d\d?:\d\d)/gm, "$1:00$2")
-    .replace(/(\d\d?:\d\d ?- ?\d\d?)(?!\d?:)/gm, "$1:00")
+    .replaceAll(/(?<!\d)(?<!:)(\d\d?)( ?- ?\d\d?:\d\d)/gm, "$1:00$2")
+    .replaceAll(/(\d\d?:\d\d ?- ?\d\d?)(?!\d?:)/gm, "$1:00")
     // cosmetic fix for strange date display
-    .replace(/\((\d\d?\/\d\d?)\)/gm, " $1 ")
+    .replaceAll(/\((\d\d?\/\d\d?)\)/gm, " $1 ")
     // fix for missing month in end of date range
-    .replace(/(\d?\d)(\/\d?\d)(-)(\d?\d)/gm, "$1$2 $3 $1/$4")
+    .replaceAll(/(\d?\d)(\/\d?\d)(-)(\d?\d)/gm, "$1$2 $3 $1/$4")
 
 /* eslint-enable no-irregular-whitespace */
 
 /**
- * simply attempts to convert to a date string supported by
- * Google Calendar with empty string fallback
+ * simply attempts to convert to a date string supported by Google Calendar with empty
+ * string fallback
  *
  * @param {string} str - date-like arbitrary string
  * @returns {string} GCal supported date string or empty string
@@ -163,12 +166,12 @@ const formatAsGCalDate = (str = "") =>
   (str &&
     new Date(str) &&
     new Date(str).toISOString() &&
-    new Date(str).toISOString().replace(/-|:|\.\d{3}/g, "")) ||
+    new Date(str).toISOString().replaceAll(/-|:|\.\d{3}/g, "")) ||
   ""
 
 /**
- * takes info about events and encodes it into a url that opens Google
- * Calendar and automatically creates and fills in event info provided
+ * takes info about events and encodes it into a url that opens Google Calendar and
+ * automatically creates and fills in event info provided
  *
  * @param {string} title - as shown on GCal event
  * @param {string} start - GCal date-like val of event start
@@ -177,13 +180,7 @@ const formatAsGCalDate = (str = "") =>
  * @param {string} location - physical location of event
  * @returns {string} encoded URL of endpoint and query args to target
  */
-const buildLink = (
-  title = "",
-  start = "",
-  end = "",
-  details = "",
-  location = ""
-) => {
+const buildLink = (title = "", start = "", end = "", details = "", location = "") => {
   const link = new URLSearchParams()
   const startFormatted = formatAsGCalDate(start)
   let endFormatted = formatAsGCalDate(end)
@@ -209,8 +206,8 @@ const buildLink = (
 }
 
 /**
- * template for each card display of info from parsed date/time
- * from email body using `lit-html`
+ * template for each card display of info from parsed date/time from email body using
+ * `lit-html`
  *
  * @param {string} orig - original date-like string
  * @param {string} start - completely parsed date-like event start
@@ -225,7 +222,7 @@ const card = (orig, start = "", end = "", link = "#") => html`
       <p>
         <span class="text-c label-date">
           <!-- REVIEW: keep 'At' label? -->
-          ${!end ? "At: " : "Start: "}
+          ${end ? "Start: " : "At: "}
         </span>
         ${start}
       </p>
@@ -242,8 +239,8 @@ const card = (orig, start = "", end = "", link = "#") => html`
 `
 
 /**
- * template for container of cards with info from parsed date/time
- * from email body using `lit-html`
+ * template for container of cards with info from parsed date/time from email body using
+ * `lit-html`
  *
  * @param {ChronoDates} matches - result array of calling chrono.parse
  * @param {string} title - as shown on GCal event
@@ -264,27 +261,25 @@ const cards = (matches, title, details, location) =>
  * @returns {TemplateResult} sidebar with appropriate header and cards
  */
 const sidebar = (items) =>
-  items.length !== 0
+  items.length === 0
     ? html`
+        <p class="text-large align-center padding-top-large">no matches</p>
+      `
+    : html`
         <h2 class="text-xlarge align-center padding-top-medium text-600">
           detected events
         </h2>
         ${items}
       `
-    : html`<p class="text-large align-center padding-top-large">no matches</p>`
 
 // activate reload button
-document
-  .querySelector("#reload")
-  ?.addEventListener("click", () => Missive.reload())
+document.querySelector("#reload")?.addEventListener("click", () => Missive.reload())
 
 // activate github button
 document
   .querySelector(".support-icon")
   ?.addEventListener("click", () =>
-    Missive.openURL(
-      "https://github.com/zachhardesty7/missive-gcal-export-integration"
-    )
+    Missive.openURL("https://github.com/zachhardesty7/missive-gcal-export-integration"),
   )
 
 const handleConversationsChange = (ids) => {
@@ -321,9 +316,7 @@ const handleConversationsChange = (ids) => {
             console.log("matches", matches)
           }
 
-          const emailBody = INCLUDE_BODY
-            ? `\n\n<strong>EMAIL:</strong>\n${body}`
-            : ""
+          const emailBody = INCLUDE_BODY ? `\n\n<strong>EMAIL:</strong>\n${body}` : ""
           const details = `<strong>LINK:</strong>\n${link}${emailBody}`
           const cardItems = cards(matches, message.subject, details)
 
@@ -332,20 +325,20 @@ const handleConversationsChange = (ids) => {
         }
       } else if (conversations && conversations.length >= 2) {
         // multiple convos loaded
-        const multipleSelections = html`<p
-          class="text-large align-center padding-top-large"
-        >
-          multiple conversations selected
-        </p>`
+        const multipleSelections = html`
+          <p class="text-large align-center padding-top-large">
+            multiple conversations selected
+          </p>
+        `
 
         render(multipleSelections, results)
       } else {
         // no convo loaded
-        const noSelection = html`<p
-          class="text-large align-center padding-top-large"
-        >
-          no conversation selected
-        </p>`
+        const noSelection = html`
+          <p class="text-large align-center padding-top-large">
+            no conversation selected
+          </p>
+        `
 
         render(noSelection, results)
       }
@@ -361,19 +354,18 @@ const handleConversationsChange = (ids) => {
     })
 }
 
-/**
- * triggers each time email is loaded and renders found matches
- */
+/** triggers each time email is loaded and renders found matches */
 Missive.on("change:conversations", handleConversationsChange)
 handleConversationsChange(Missive.state.conversations)
 
 /**
- * @typedef {import('lit-html').TemplateResult} TemplateResult
+ * @typedef {import("lit-html").TemplateResult} TemplateResult
+ *
  * @typedef {{
- *  index: number,
- *  text: string,
- *  tags: object,
- *  start: { knownValues: [object],impliedValues: [object] },
- *  end: { knownValues: [object], impliedValues: [object] }
+ *   index: number
+ *   text: string
+ *   tags: object
+ *   start: { knownValues: [object]; impliedValues: [object] }
+ *   end: { knownValues: [object]; impliedValues: [object] }
  * }[]} ChronoDates
  */
