@@ -1,6 +1,7 @@
 /* global Missive chrono */
 
 import { html, render } from "https://unpkg.com/lit-html@2.8.0/lit-html.js?module"
+import { unsafeHTML } from "https://unpkg.com/lit-html@2.8.0/directives/unsafe-html.js?module"
 
 // doesn't make much sense to create a calendar event in the past
 const HIDE_PAST_EVENTS = true
@@ -51,6 +52,25 @@ const blacklistCaseInsensitive = [
 ]
 
 /**
+ * checks used to determine if matches should be kept
+ *
+ * @param {ChronoDates[number]} match
+ */
+function shouldKeepMatch(match) {
+  return (
+    // remove blacklisted items
+    !blacklistCaseSensitive.has(match.text.trim()) &&
+    !blacklistCaseInsensitive
+      .map((str) => str.toLowerCase())
+      .includes(match.text.trim().toLowerCase()) &&
+    // remove items without valid start datetime
+    match.start.toString() !== "Invalid Date" &&
+    // if enabled, hide datetimes that started in the past
+    (!HIDE_PAST_EVENTS || !Missive.isPast(match.start))
+  )
+}
+
+/**
  * filters out certain text matches if any of the (enabled) following are true: case
  * sensitive or insensitive blacklisted, start is 'Invalid Date' when parsing, event
  * starts in the past, duplicate text, duplicate start and end time
@@ -74,25 +94,40 @@ const filterMatches = (matches) => {
     return clone
   })
 
-  const filteredMatches = cleanMatches
-    // remove blacklisted items
-    .filter(({ text }) => !blacklistCaseSensitive.has(text.trim()))
-    .filter(
-      ({ text }) =>
-        !blacklistCaseInsensitive
-          .map((str) => str.toLowerCase())
-          .includes(text.trim().toLowerCase()),
-    )
+  const debugMatches = cleanMatches.map((match) => {
+    const newMatch = { ...match }
 
-    // remove items without valid start datetime
-    .filter(({ start }) => start.toString() !== "Invalid Date")
+    // append debug info if any of the filters would have removed this match
+    if (!shouldKeepMatch(match)) {
+      newMatch.text = `<s>${match.text}</s><br>(DEBUG) rm'd by filters:`
+    }
 
-    // if enabled, hide datetimes that started in the past
-    .filter(({ start }) => !HIDE_PAST_EVENTS || !Missive.isPast(start))
+    // check each item in {@link matchFilter} individually
+    if (blacklistCaseSensitive.has(match.text.trim())) {
+      newMatch.text += `<br>- blacklistCaseSensitive`
+    }
+    if (
+      blacklistCaseInsensitive
+        .map((str) => str.toLowerCase())
+        .includes(match.text.trim().toLowerCase())
+    ) {
+      newMatch.text += `<br>- blacklistCaseInsensitive`
+    }
+    if (match.start.toString() === "Invalid Date") {
+      newMatch.text += `<br>- start Invalid Date`
+    }
+    if (HIDE_PAST_EVENTS && Missive.isPast(match.start)) {
+      newMatch.text += `<br>- start in past`
+    }
+
+    return newMatch
+  })
+
+  const processedMatches = DEBUG ? debugMatches : cleanMatches.filter(shouldKeepMatch)
 
   // convert from arr -> obj -> arr to remove identical text datetimes
   let matchTable = {}
-  for (const match of filteredMatches) {
+  for (const match of processedMatches) {
     if (!matchTable[match.text]) {
       matchTable[match.text] = match
     }
@@ -217,7 +252,7 @@ const buildLink = (title = "", start = "", end = "", details = "", location = ""
  */
 const card = (orig, start = "", end = "", link = "#") => html`
   <div class="card shadow padding-xlarge">
-    <h3 class="title text-600">${orig}</h3>
+    <h3 class="title text-600">${DEBUG ? unsafeHTML(orig) : orig}</h3>
     <div class="margin-top-xlarge margin-bottom-xlarge">
       <p>
         <span class="text-c label-date">
