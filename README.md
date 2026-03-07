@@ -44,11 +44,11 @@ options will work:
 
 ## Known Issues
 
-- rudimentary timezone indicator fix requires manually removing and causes issues when
-  not located in the timezone from the email (i.e. does not localize)
+- rudimentary timezone indicator fix requires manually removing timezone which causes issues when
+  not located in the same timezone as the datetime in email (i.e. does not localize)
 - most Eastern timezones result in datetime detection failure
-- fails detection if "the 10th" isn't preceded by a day this week (needs custom chrono.js parser feature)
-- temp replacement since localhost.me ent down, investigate
+- fails to detect datetime if "the 10th" isn't preceded by a day this week (needs custom chrono.js parser feature)
+- using temp replacement since localhost.me went down, investigate
   [tunnel-tool](https://github.com/vicjicaman/tunnel-tool) and [DIY ngrok](https://igauravsehrawat.com/build-your-own-ngrok-4-easy-steps/)
 
 ## Acknowledgements
@@ -76,4 +76,4 @@ used to make this integration look first-party
 [missive-javascript-api](https://missiveapp.com/help/api-documentation/iframe-integrations-api) -
 all of the functions come from here to hook into Missive
 
-*Copyright (c) 2020 || Zach Hardesty || [zachhardesty.com](https://zachhardesty.com)*
+*Copyright (c) 2020-2026 || Zach Hardesty || [zachhardesty.com](https://zachhardesty.com)*
